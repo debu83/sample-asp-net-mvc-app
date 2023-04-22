@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     SOLUTION: SampleAspNetWebApplication.sln
-    DOTNET_FRAMEWORK: 4.5.2
+    DOTNET_FRAMEWORK: 4.8
     PACKAGE_DIRECTORY: .\packages
 
 phases:
