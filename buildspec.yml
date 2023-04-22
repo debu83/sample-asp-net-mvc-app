@@ -2,34 +2,14 @@ version: 0.2
 
 env:
   variables:
-    SOLUTION: SampleAspNetWebApplication.sln
-    DOTNET_FRAMEWORK: 4.8
-    PACKAGE_DIRECTORY: .\packages
-
+    PROJECT: SampleAspNetWebApplication
+    DOTNET_FRAMEWORK: 4.5.2
 phases:
-  install:
-    commands:      
-      - echo "Use this phase to install any dependency that your application may need before building it."
-  pre_build:
-    commands:
-      - nuget restore $env:SOLUTION -PackagesDirectory $env:PACKAGE_DIRECTORY
   build:
     commands:
-      - msbuild .\SampleAspNetWebApplication\SampleAspNetWebApplication.csproj /t:package /p:TargetFrameworkVersion=v$env:DOTNET_FRAMEWORK /p:Configuration=Release
- post_build:
-    commands:
-      - echo "Preparing API Source bundle artifacts"
-      - $publishWebFolder = ".\publish\workspace\api"; mkdir $publishWebFolder
-      - cp .\SampleAspNetWebApplication\obj\Release\Package\SampleAspNetWebApplication.zip $publishWebFolder\SampleAspNetWebApplication.zip
-      - cp .\SetupScripts\InstallDependencies.ps1 $publishWebFolder\InstallDependencies.ps1
-      - cp .\SampleAspNetWebApplication\aws-windows-deployment-manifest.json $publishWebFolder\aws-windows-deployment-manifest.json
-      - cp .\SampleAspNetWebApplication\.ebextensions $publishWebFolder -Recurse
+      - nuget restore
+      - msbuild $env:PROJECT.csproj /p:TargetFrameworkVersion=v$env:DOTNET_FRAMEWORK /p:Configuration=Release /p:DeployIisAppPath="Default Web Site" /p:PackageAsSingleFile=false /p:OutDir=C:\codebuild\artifacts\ /t:Package
 artifacts:
   files:
     - '**/*'
-  secondary-artifacts:
-    web:
-      name: web
-      base-directory: $publishWebFolder
-      files:
-        - '**/*'
+  base-directory: 'C:\codebuild\artifacts\_PublishedWebsites\${env:PROJECT}_Package\Archive\'
